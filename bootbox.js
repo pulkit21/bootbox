@@ -42,8 +42,8 @@
       "</div>",
     footer:
       "<div class='modal-footer'></div>",
-    closeButton:
-      "<button type='button' class='bootbox-close-button close' data-dismiss='modal' aria-hidden='true'>&times;</button>",
+    // closeButton:
+    //   "<button type='button' class='bootbox-close-button close' data-dismiss='modal' aria-hidden='true'>&times;</button>",
     form:
       "<form class='bootbox-form'></form>",
     inputs: {
@@ -78,7 +78,7 @@
     // additional class string applied to the top level dialog
     className: null,
     // whether or not to include a close button
-    closeButton: true,
+    // closeButton: true,
     // show the dialog immediately by default
     show: true,
     // dialog container
@@ -605,15 +605,15 @@
       body.before(templates.header);
     }
 
-    if (options.closeButton) {
-      var closeButton = $(templates.closeButton);
+    // if (options.closeButton) {
+    //   var closeButton = $(templates.closeButton);
 
-      if (options.title) {
-        dialog.find(".modal-header").prepend(closeButton);
-      } else {
-        closeButton.css("margin-top", "-10px").prependTo(body);
-      }
-    }
+    //   if (options.title) {
+    //     dialog.find(".modal-header").prepend(closeButton);
+    //   } else {
+    //     closeButton.css("margin-top", "-10px").prependTo(body);
+    //   }
+    // }
 
     if (options.title) {
       dialog.find(".modal-title").html(options.title);
