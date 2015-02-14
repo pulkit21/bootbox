@@ -1,5 +1,5 @@
 /**
- * bootbox.js [master branch]
+ * bootbox.js [v4.3.0]
  *
  * http://bootboxjs.com/license.txt
  */
@@ -71,8 +71,8 @@
   var defaults = {
     // default language
     locale: "en",
-    // show backdrop or not. Default to static so user has to interact with dialog
-    backdrop: "static",
+    // show backdrop or not
+    backdrop: true,
     // animate the modal in/out
     animate: true,
     // additional class string applied to the top level dialog
@@ -105,7 +105,7 @@
 
     // so, if the callback can be invoked and it *explicitly returns false*
     // then we'll set a flag to keep the dialog active...
-    var preserveDialog = $.isFunction(callback) && callback.call(dialog, e) === false;
+    var preserveDialog = $.isFunction(callback) && callback(e) === false;
 
     // ... otherwise we'll bin it
     if (!preserveDialog) {
@@ -148,6 +148,11 @@
       options.buttons = {};
     }
 
+    // we only support Bootstrap's "static" and false backdrop args
+    // supporting true would mean you could dismiss the dialog without
+    // explicitly interacting with it
+    options.backdrop = options.backdrop ? "static" : false;
+
     buttons = options.buttons;
 
     total = getKeyLength(buttons);
@@ -177,7 +182,7 @@
           // always add a primary to the main option in a two-button dialog
           button.className = "btn-primary";
         } else {
-          button.className = "btn-default";
+          button.className = "btn-danger";
         }
       }
     });
@@ -292,23 +297,6 @@
 
     return options;
   }
-
-  /**
-   * @TODO: split into addLocale / removeLocale
-   */
-  exports.defineLocale = function (name, values) {
-    if (values) {
-      locales[name] = {
-        OK: values.OK,
-        CANCEL: values.CANCEL,
-        CONFIRM: values.CONFIRM
-      };
-      return locales[name];
-    } else {
-      delete locales[name];
-      return null;
-    }
-  };
 
   exports.alert = function() {
     var options;
@@ -479,6 +467,7 @@
             throw new Error("given options in wrong format");
           }
 
+
           // ... but override that element if this option sits in a group
 
           if (option.group) {
@@ -540,7 +529,7 @@
       input.attr("placeholder", options.placeholder);
     }
 
-    if (options.pattern) {
+    if(options.pattern){
       input.attr("pattern", options.pattern);
     }
 
@@ -563,8 +552,6 @@
 
     // ...and replace it with one focusing our input, if possible
     dialog.on("shown.bs.modal", function() {
-      // need the closure here since input isn't
-      // an object otherwise
       input.focus();
     });
 
@@ -587,20 +574,12 @@
       onEscape: options.onEscape
     };
 
-    if ($.fn.modal === undefined) {
-      throw new Error(
-        "$.fn.modal is not defined; please double check you have included " +
-        "the Bootstrap JavaScript library. See http://getbootstrap.com/javascript/ " +
-        "for more details."
-      );
-    }
-
     each(buttons, function(key, button) {
 
       // @TODO I don't like this string appending to itself; bit dirty. Needs reworking
       // can we just build up button elements instead? slower but neater. Then button
       // can just become a template too
-      buttonStr += "<button data-bb-handler='" + key + "' type='button' class='btn " + button.className + "'>" + button.label + "</button>";
+      buttonStr += "<button data-bb-handler='" + key + "' type='button' class='btn " + button.className + "'>" + "<i class=' fa " + button.label + "'>" + "</i>" + "</button>";
       callbacks[key] = button.callback;
     });
 
@@ -616,7 +595,9 @@
 
     if (options.size === "large") {
       innerDialog.addClass("modal-lg");
-    } else if (options.size === "small") {
+    }
+
+    if (options.size === "small") {
       innerDialog.addClass("modal-sm");
     }
 
@@ -680,23 +661,6 @@
      * respective triggers
      */
 
-    if (options.backdrop !== "static") {
-      // A boolean true/false according to the Bootstrap docs
-      // should show a dialog the user can dismiss by clicking on
-      // the background.
-      // We always only ever pass static/false to the actual
-      // $.modal function because with `true` we can't trap
-      // this event (the .modal-backdrop swallows it)
-      // However, we still want to sort of respect true
-      // and invoke the escape mechanism instead
-      dialog.on("click.dismiss.bs.modal", function(e) {
-        if (e.target !== e.currentTarget) {
-          return;
-        }
-        dialog.trigger("escape.close.bb");
-      });
-    }
-
     dialog.on("escape.close.bb", function(e) {
       if (callbacks.onEscape) {
         processCallback(e, dialog, callbacks.onEscape);
@@ -736,7 +700,7 @@
     $(options.container).append(dialog);
 
     dialog.modal({
-      backdrop: options.backdrop ? "static": false,
+      backdrop: options.backdrop,
       keyboard: false,
       show: false
     });
@@ -795,11 +759,6 @@
    * unlikely to be required. If this gets too large it can be split out into separate JS files.
    */
   var locales = {
-    bg_BG : {
-      OK      : "Ок",
-      CANCEL  : "Отказ",
-      CONFIRM : "Потвърждавам"
-    },
     br : {
       OK      : "OK",
       CANCEL  : "Cancelar",
@@ -827,8 +786,8 @@
     },
     en : {
       OK      : "OK",
-      CANCEL  : "Cancel",
-      CONFIRM : "OK"
+      CANCEL  : "fa-times",
+      CONFIRM : "fa-check"
     },
     es : {
       OK      : "OK",
@@ -839,11 +798,6 @@
       OK      : "OK",
       CANCEL  : "Katkesta",
       CONFIRM : "OK"
-    },
-    fa : {
-      OK      : "قبول",
-      CANCEL  : "لغو",
-      CONFIRM : "تایید"
     },
     fi : {
       OK      : "OK",
@@ -859,16 +813,6 @@
       OK      : "אישור",
       CANCEL  : "ביטול",
       CONFIRM : "אישור"
-    },
-    hu : {
-      OK      : "OK",
-      CANCEL  : "Mégsem",
-      CONFIRM : "Megerősít"
-    },
-    hr : {
-      OK      : "OK",
-      CANCEL  : "Odustani",
-      CONFIRM : "Potvrdi"
     },
     id : {
       OK      : "OK",
@@ -920,20 +864,10 @@
       CANCEL  : "Отмена",
       CONFIRM : "Применить"
     },
-    sq : {
-      OK : "OK",
-      CANCEL : "Anulo",
-      CONFIRM : "Prano"
-    },
     sv : {
       OK      : "OK",
       CANCEL  : "Avbryt",
       CONFIRM : "OK"
-    },
-    th : {
-      OK      : "ตกลง",
-      CANCEL  : "ยกเลิก",
-      CONFIRM : "ยืนยัน"
     },
     tr : {
       OK      : "Tamam",
