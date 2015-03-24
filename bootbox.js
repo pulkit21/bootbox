@@ -30,7 +30,7 @@
   var templates = {
     dialog:
       "<div class='bootbox modal' tabindex='-1' role='dialog'>" +
-      "<div class='modal-backdrop fade in' style='height: 404px;'>" + "</div>" +
+      // "<div class='modal-backdrop fade in' style='height: 404px;'>" + "</div>" +
         "<div class='modal-dialog'>" +
           "<div class='modal-content'>" +
             "<div class='modal-body'><div class='bootbox-body'></div></div>" +
